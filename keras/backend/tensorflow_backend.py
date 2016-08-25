@@ -821,6 +821,20 @@ def spatial_2d_padding(x, padding=(1, 1), dim_ordering='th'):
     return tf.pad(x, pattern)
 
 
+def asymmetric_spatial_2d_padding(x, padding=(1, 1, 1, 1), dim_ordering='th'):
+    '''Pad the 2nd and 3rd dimensions of a 4D tensor
+    with "padding[0]", "padding[1]", "padding[2]", "padding[3]"  (resp.) zeros rows left, right; cols left, right.
+    '''
+    if dim_ordering == 'th':
+        pattern = [[0, 0], [0, 0],
+                   [padding[0], padding[1]], [padding[2], padding[3]]]
+    else:
+        pattern = [[0, 0],
+                   [padding[0], padding[1]], [padding[2], padding[3]],
+                   [0, 0]]
+    return tf.pad(x, pattern)
+
+
 def spatial_3d_padding(x, padding=(1, 1, 1), dim_ordering='th'):
     '''Pads 5D tensor with zeros for the depth, height, width dimension with
     "padding[0]", "padding[1]" and "padding[2]" (resp.) zeros left and right
