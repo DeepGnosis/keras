@@ -559,6 +559,40 @@ def spatial_2d_padding(x, padding=(1, 1), dim_ordering='th'):
     return T.set_subtensor(output[indices], x)
 
 
+def asymmetric_spatial_2d_padding(x, padding=(1, 1, 1, 1), dim_ordering='th'):
+    '''Pad the 2nd and 3rd dimensions of a 4D tensor
+    with "padding[0]", "padding[1]", "padding[2]", "padding[3]"  (resp.) zeros rows left, right; cols left, right.
+    '''
+    from theano import tensor as T
+
+    input_shape = x.shape
+    if dim_ordering == 'th':
+        output_shape = (input_shape[0],
+                        input_shape[1],
+                        input_shape[2] + padding[0] + padding[1],
+                        input_shape[3] + padding[2] + padding[3])
+        output = T.zeros(output_shape)
+        indices = (slice(None),
+                   slice(None),
+                   slice(padding[0], input_shape[2] + padding[0]),
+                   slice(padding[2], input_shape[3] + padding[2]))
+
+    elif dim_ordering == 'tf':
+        output_shape = (input_shape[0],
+                        input_shape[1] + padding[0] + padding[1],
+                        input_shape[2] + padding[2] + padding[3],
+                        input_shape[3])
+        print(output_shape)
+        output = T.zeros(output_shape)
+        indices = (slice(None),
+                   slice(padding[0], input_shape[1] + padding[0]),
+                   slice(padding[1], input_shape[2] + padding[2]),
+                   slice(None))
+    else:
+        raise Exception('Invalid dim_ordering: ' + dim_ordering)
+    return T.set_subtensor(output[indices], x)
+
+
 def spatial_3d_padding(x, padding=(1, 1, 1), dim_ordering='th'):
     '''Pad the 2nd, 3rd and 4th dimensions of a 5D tensor
     with "padding[0]", "padding[1]" and "padding[2]" (resp.) zeros left and right.
