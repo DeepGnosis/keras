@@ -1447,7 +1447,7 @@ class ZeroPadding2D(Layer):
     '''Zero-padding layer for 2D input (e.g. picture).
 
     # Arguments
-        padding: tuple of int (length 2)
+        padding: tuple of int (length 4)
             How many zeros to add at the beginning and end of
             the 2 padding dimensions (axis 3 and 4).
         dim_ordering: 'th' or 'tf'.
@@ -1466,26 +1466,30 @@ class ZeroPadding2D(Layer):
         (samples, depth, first_padded_axis, second_padded_axis)
     '''
 
-    def __init__(self, padding=(1, 1), dim_ordering='default', **kwargs):
+    def __init__(self, padding=(1, 1, 1, 1), dim_ordering='default', **kwargs):
         super(ZeroPadding2D, self).__init__(**kwargs)
         if dim_ordering == 'default':
             dim_ordering = K.image_dim_ordering()
-        self.padding = tuple(padding)
+        assert len(padding) in [2, 4], 'padding must be tuple with length 4 or length 2'
+        if len(padding) == 2:
+            self.padding = (padding[0], padding[0], padding[1], padding[1])
+        else:
+            self.padding = tuple(padding)
         assert dim_ordering in {'tf', 'th'}, 'dim_ordering must be in {tf, th}'
         self.dim_ordering = dim_ordering
         self.input_spec = [InputSpec(ndim=4)]
 
     def get_output_shape_for(self, input_shape):
         if self.dim_ordering == 'th':
-            width = input_shape[2] + 2 * self.padding[0] if input_shape[2] is not None else None
-            height = input_shape[3] + 2 * self.padding[1] if input_shape[3] is not None else None
+            width = input_shape[2] + self.padding[0] + self.padding[1] if input_shape[2] is not None else None
+            height = input_shape[3] + self.padding[2] + self.padding[3] if input_shape[3] is not None else None
             return (input_shape[0],
                     input_shape[1],
                     width,
                     height)
         elif self.dim_ordering == 'tf':
-            width = input_shape[1] + 2 * self.padding[0] if input_shape[1] is not None else None
-            height = input_shape[2] + 2 * self.padding[1] if input_shape[2] is not None else None
+            width = input_shape[1] + self.padding[0] + self.padding[1] if input_shape[1] is not None else None
+            height = input_shape[2] + self.padding[2] + self.padding[3] if input_shape[2] is not None else None
             return (input_shape[0],
                     width,
                     height,
@@ -1494,8 +1498,8 @@ class ZeroPadding2D(Layer):
             raise Exception('Invalid dim_ordering: ' + self.dim_ordering)
 
     def call(self, x, mask=None):
-        return K.spatial_2d_padding(x, padding=self.padding,
-                                    dim_ordering=self.dim_ordering)
+        return K.asymmetric_spatial_2d_padding(x, padding=self.padding,
+                                               dim_ordering=self.dim_ordering)
 
     def get_config(self):
         config = {'padding': self.padding}
