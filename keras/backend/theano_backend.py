@@ -604,9 +604,9 @@ def spatial_2d_padding(x, padding=(1, 1), dim_ordering=_IMAGE_DIM_ORDERING):
     return T.set_subtensor(output[indices], x)
 
 
-def asymmetric_spatial_2d_padding(x, padding=(1, 1, 1, 1), dim_ordering='th'):
-    '''Pad the 2nd and 3rd dimensions of a 4D tensor
-    with "padding[0]", "padding[1]", "padding[2]", "padding[3]"  (resp.) zeros rows left, right; cols left, right.
+def asymmetric_spatial_2d_padding(x, top_pad=1, bottom_pad=1, left_pad=1, right_pad=1, dim_ordering=_IMAGE_DIM_ORDERING):
+    '''Pad the rows and columns of a 4D tensor
+    with "top_pad", "bottom_pad", "left_pad", "right_pad"  (resp.) zeros rows on top, bottom; cols on left, right.
     '''
     from theano import tensor as T
 
@@ -614,24 +614,24 @@ def asymmetric_spatial_2d_padding(x, padding=(1, 1, 1, 1), dim_ordering='th'):
     if dim_ordering == 'th':
         output_shape = (input_shape[0],
                         input_shape[1],
-                        input_shape[2] + padding[0] + padding[1],
-                        input_shape[3] + padding[2] + padding[3])
+                        input_shape[2] + top_pad + bottom_pad,
+                        input_shape[3] + left_pad + right_pad)
         output = T.zeros(output_shape)
         indices = (slice(None),
                    slice(None),
-                   slice(padding[0], input_shape[2] + padding[0]),
-                   slice(padding[2], input_shape[3] + padding[2]))
+                   slice(top_pad, input_shape[2] + top_pad),
+                   slice(left_pad, input_shape[3] + left_pad))
 
     elif dim_ordering == 'tf':
         output_shape = (input_shape[0],
-                        input_shape[1] + padding[0] + padding[1],
-                        input_shape[2] + padding[2] + padding[3],
+                        input_shape[1] + top_pad + bottom_pad,
+                        input_shape[2] + left_pad + right_pad,
                         input_shape[3])
         print(output_shape)
         output = T.zeros(output_shape)
         indices = (slice(None),
-                   slice(padding[0], input_shape[1] + padding[0]),
-                   slice(padding[1], input_shape[2] + padding[2]),
+                   slice(top_pad, input_shape[1] + top_pad),
+                   slice(left_pad, input_shape[2] + left_pad),
                    slice(None))
     else:
         raise Exception('Invalid dim_ordering: ' + dim_ordering)

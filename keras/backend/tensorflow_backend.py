@@ -858,16 +858,19 @@ def spatial_2d_padding(x, padding=(1, 1), dim_ordering=_IMAGE_DIM_ORDERING):
     return tf.pad(x, pattern)
 
 
-def asymmetric_spatial_2d_padding(x, padding=(1, 1, 1, 1), dim_ordering='th'):
-    '''Pad the 2nd and 3rd dimensions of a 4D tensor
-    with "padding[0]", "padding[1]", "padding[2]", "padding[3]"  (resp.) zeros rows left, right; cols left, right.
+def asymmetric_spatial_2d_padding(x, top_pad=1, bottom_pad=1, left_pad=1, right_pad=1, dim_ordering=_IMAGE_DIM_ORDERING):
+    '''Pad the rows and columns of a 4D tensor
+    with "top_pad", "bottom_pad", "left_pad", "right_pad"  (resp.) zeros rows on top, bottom; cols on left, right.
     '''
     if dim_ordering == 'th':
-        pattern = [[0, 0], [0, 0],
-                   [padding[0], padding[1]], [padding[2], padding[3]]]
+        pattern = [[0, 0],
+                   [0, 0],
+                   [top_pad, bottom_pad],
+                   [left_pad, right_pad]]
     else:
         pattern = [[0, 0],
-                   [padding[0], padding[1]], [padding[2], padding[3]],
+                   [top_pad, bottom_pad],
+                   [left_pad, right_pad],
                    [0, 0]]
     return tf.pad(x, pattern)
 
