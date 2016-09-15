@@ -5,6 +5,7 @@ from .. import backend as K
 from .. import activations, initializations, regularizers, constraints
 from ..engine import Layer, InputSpec
 from ..utils.np_utils import conv_output_length, conv_input_length
+from ..backend.common import _IMAGE_DIM_ORDERING
 
 # imports for backwards namespace compatibility
 from .pooling import AveragePooling1D, AveragePooling2D, AveragePooling3D
@@ -1351,7 +1352,7 @@ class ZeroPadding2D(Layer):
                  bottom_pad=1,
                  left_pad=1,
                  right_pad=1,
-                 dim_ordering='default',
+                 dim_ordering=_IMAGE_DIM_ORDERING,
                  **kwargs):
         super(ZeroPadding2D, self).__init__(**kwargs)
         if dim_ordering == 'default':
