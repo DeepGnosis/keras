@@ -1353,10 +1353,11 @@ class ZeroPadding2D(Layer):
                  right_pad=1,
                  dim_ordering='default',
                  **kwargs):
+        import sys
         super(ZeroPadding2D, self).__init__(**kwargs)
         if dim_ordering == 'default':
             dim_ordering = K.image_dim_ordering()
-        print("Dim ordering: {}".format(dim_ordering))
+        print("Dim ordering: {}".format(dim_ordering), file=sys.stderr)
 
         self.padding = padding
         self.top_pad = top_pad
