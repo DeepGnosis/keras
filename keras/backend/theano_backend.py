@@ -610,7 +610,6 @@ def asymmetric_spatial_2d_padding(x, top_pad=1, bottom_pad=1, left_pad=1, right_
     '''
     from theano import tensor as T
     import sys
-    print("Dim ordering: {}".format(dim_ordering), file=sys.stderr)
 
     input_shape = x.shape
     if dim_ordering == 'th':

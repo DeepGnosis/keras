@@ -380,11 +380,11 @@ def test_zero_padding_2d():
 
     # basic test
     layer_test(convolutional.ZeroPadding2D,
-               kwargs={'padding': (2, 2), 'dim_ordering': dim_ordering},
+               kwargs={'padding': (2, 2)},
                input_shape=input.shape)
 
     # correctness test
-    layer = convolutional.ZeroPadding2D(padding=(2, 2), dim_ordering=dim_ordering)
+    layer = convolutional.ZeroPadding2D(padding=(2, 2))
     layer.set_input(K.variable(input), shape=input.shape)
 
     out = K.eval(layer.output)
