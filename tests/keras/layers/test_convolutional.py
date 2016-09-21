@@ -369,6 +369,8 @@ def test_zero_padding_2d():
     stack_size = 2
     input_nb_row = 11
     input_nb_col = 12
+    dim_ordering = K.image_dim_ordering()
+    print("Dim ordering: {}".format(dim_ordering))
 
     input = np.ones((nb_samples, input_nb_row, input_nb_col, stack_size))
 
