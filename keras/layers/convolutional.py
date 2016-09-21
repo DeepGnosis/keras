@@ -1414,7 +1414,15 @@ class ZeroPadding1D(Layer):
     # Arguments
         padding: int
             How many zeros to add at the beginning and end of
-            the padding dimension (axis 1).
+            the padding dimension (axis 1) symmetrically.
+            Setting padding to the value different from 1
+            overrides left_pad, right_pad arguments.
+        left_pad:
+            How many zeros to add at the beginning of
+            the padding dimension.
+        right_pad:
+            How many zeros to add at the end of
+            the padding dimension.
 
     # Input shape
         3D tensor with shape (samples, axis_to_pad, features)
@@ -1423,22 +1431,29 @@ class ZeroPadding1D(Layer):
         3D tensor with shape (samples, padded_axis, features)
     '''
 
-    def __init__(self, padding=1, **kwargs):
+    def __init__(self, padding=1, left_pad=1, right_pad=1, **kwargs):
         super(ZeroPadding1D, self).__init__(**kwargs)
         self.padding = padding
+        self.left_pad = left_pad
+        self.right_pad = right_pad
+        if self.padding != 1:
+            self.left_pad = self.padding
+            self.right_pad = self.padding
         self.input_spec = [InputSpec(ndim=3)]
 
     def get_output_shape_for(self, input_shape):
-        length = input_shape[1] + self.padding * 2 if input_shape[1] is not None else None
+        length = input_shape[1] + self.left_pad + self.right_pad if input_shape[1] is not None else None
         return (input_shape[0],
                 length,
                 input_shape[2])
 
     def call(self, x, mask=None):
-        return K.temporal_padding(x, padding=self.padding)
+        return K.asymmetric_temporal_padding(x, left_pad=self.left_pad, right_pad=self.right_pad)
 
     def get_config(self):
-        config = {'padding': self.padding}
+        config = {'padding': self.padding,
+                  'left_pad': self.left_pad,
+                  'right_pad': self.right_pad}
         base_config = super(ZeroPadding1D, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
 

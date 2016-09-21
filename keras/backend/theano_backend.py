@@ -573,6 +573,21 @@ def temporal_padding(x, padding=1):
     return T.set_subtensor(output[:, padding:x.shape[1] + padding, :], x)
 
 
+def asymmetric_temporal_padding(x, left_pad=1, right_pad=1):
+    '''Pad the middle dimension of a 3D tensor
+    with "left_pad" zeros left and "right_pad" right.
+
+    Apologies for the inane API, but Theano makes this
+    really hard.
+    '''
+    input_shape = x.shape
+    output_shape = (input_shape[0],
+                    input_shape[1] + left_pad + right_pad,
+                    input_shape[2])
+    output = T.zeros(output_shape)
+    return T.set_subtensor(output[:, left_pad:x.shape[1] + left_pad, :], x)
+
+
 def spatial_2d_padding(x, padding=(1, 1), dim_ordering=_IMAGE_DIM_ORDERING):
     '''Pad the 2nd and 3rd dimensions of a 4D tensor
     with "padding[0]" and "padding[1]" (resp.) zeros left and right.
