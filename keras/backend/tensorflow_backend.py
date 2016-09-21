@@ -862,6 +862,7 @@ def asymmetric_spatial_2d_padding(x, top_pad=1, bottom_pad=1, left_pad=1, right_
     '''Pad the rows and columns of a 4D tensor
     with "top_pad", "bottom_pad", "left_pad", "right_pad"  (resp.) zeros rows on top, bottom; cols on left, right.
     '''
+    print("Dim ordering: {}".format(dim_ordering))
     if dim_ordering == 'th':
         pattern = [[0, 0],
                    [0, 0],
