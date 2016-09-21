@@ -371,23 +371,34 @@ def test_zero_padding_2d():
     input_nb_col = 12
     dim_ordering = K.image_dim_ordering()
     print("Dim ordering: {}".format(dim_ordering))
+    assert dim_ordering in {'tf', 'th'}, 'dim_ordering must be in {tf, th}'
 
-    input = np.ones((nb_samples, input_nb_row, input_nb_col, stack_size))
+    if dim_ordering == 'tf':
+        input = np.ones((nb_samples, input_nb_row, input_nb_col, stack_size))
+    elif dim_ordering == 'th':
+        input = np.ones((nb_samples, stack_size, input_nb_row, input_nb_col))
 
     # basic test
     layer_test(convolutional.ZeroPadding2D,
                kwargs={'padding': (2, 2)},
-               input_shape=input.shape)
+               input_shape=input.shape,
+               dim_ordering=dim_ordering)
 
     # correctness test
     layer = convolutional.ZeroPadding2D(padding=(2, 2))
-    layer.set_input(K.variable(input), shape=input.shape)
+    layer.set_input(K.variable(input), shape=input.shape, dim_ordering=dim_ordering)
 
     out = K.eval(layer.output)
-    for offset in [0, 1, -1, -2]:
-        assert_allclose(out[:, offset, :, :], 0.)
-        assert_allclose(out[:, :, offset, :], 0.)
-    assert_allclose(out[:, 2:-2, 2:-2, :], 1.)
+    if dim_ordering == 'tf':
+        for offset in [0, 1, -1, -2]:
+            assert_allclose(out[:, offset, :, :], 0.)
+            assert_allclose(out[:, :, offset, :], 0.)
+        assert_allclose(out[:, 2:-2, 2:-2, :], 1.)
+    elif dim_ordering == 'th':
+        for offset in [0, 1, -1, -2]:
+            assert_allclose(out[:, :, offset, :], 0.)
+            assert_allclose(out[:, :, :, offset], 0.)
+        assert_allclose(out[:, 2:-2, 2:-2, :], 1.)
     layer.get_config()
 
 
